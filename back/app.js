@@ -21,6 +21,7 @@ app.use(
       scriptSrc: [
         "'self'",
         // 'trusted-scripts.com', dominio cliente
+        'https://mer-civ.vercel.app/',
         `${FRONT_URL}`,
         'http://localhost:3001',
         // 'cdn.jsdelivr.net', adquirir cuando el cliente lo desee
