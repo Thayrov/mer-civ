@@ -1,0 +1,33 @@
+name: Auto Merge dev to main
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  merge-dev-to-main:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: 'dev'
+        fetch-depth: 0
+
+    - name: Configure Git
+      run: |
+        git config --global user.email "thayrovg@gmail.com"
+        git config --global user.name "thayrov"
+
+    - name: Merge dev to main
+      run: |
+        git fetch origin main:main
+        git checkout main
+        git merge --no-ff dev -m "Merging dev into main"
+        
+    - name: Push Changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: 'main'
