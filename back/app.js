@@ -6,7 +6,7 @@ const corsConfig = require('./config/cors.config');
 const errorCatcher = require('./config/error.config');
 const passport = require('./config/passportSetup');
 const { methodLogger } = require('./config/logger.config');
-const { SECRET_COOKIE, FRONT_URL } = require('./config/env.config');
+const { SECRET_COOKIE, FRONT_URL, API_URL } = require('./config/env.config');
 const { handleFileUpload } = require('./middleware/multer');
 // const job = require('./src/handlers/pedidosProveedor/timerDeProducto');
 
@@ -23,6 +23,8 @@ app.use(
         // 'trusted-scripts.com', dominio cliente
         'https://mer-civ.vercel.app/',
         `${FRONT_URL}`,
+        `${API_URL}`,
+        'https://mer-civ.vercel.app',
         'http://localhost:3001',
         // 'cdn.jsdelivr.net', adquirir cuando el cliente lo desee
         'apis.google.com', // Permitir scripts de Google Auth
@@ -40,6 +42,7 @@ app.use(
         'res.cloudinary.com', // Permitir imágenes de Cloudinary
         'www.google.com', // Permitir imágenes de Google Auth
         `${FRONT_URL}`,
+        `${API_URL}`,
         'http://localhost:3001',
       ],
     },
