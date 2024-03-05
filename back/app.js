@@ -21,6 +21,7 @@ app.use(
       scriptSrc: [
         "'self'",
         // 'trusted-scripts.com', dominio cliente
+        'https://mer-civ.vercel.app/',
         `${FRONT_URL}`,
         `${API_URL}`,
         'https://mer-civ.vercel.app',
