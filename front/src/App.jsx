@@ -83,14 +83,14 @@ function App() {
         } catch (error) {
           if (error.response.data.redirectToLogin) {
             setOpen(false);
-            dispatch(logout());
+            await dispatch(logout());
             navigate('/login');
             window.location.reload();
           }
         } finally {
           console.log('token');
-
-          setTimeout(checkAuthentication, 100000);
+          let hour = 60000;
+          setTimeout(checkAuthentication, 60 * hour);
         }
       }
     };
@@ -107,9 +107,13 @@ function App() {
   const isUserDetailPage = useMatch('/admin/users/detail/:id');
   const isProductDetailPage = useMatch('/admin/products/detail/:id');
 
+  const getFavorites = async () => {
+    if (token) await dispatch(getAllFavorite());
+  };
+
   useEffect(() => {
-    token && dispatch(getAllFavorite());
-  }, [dispatch]);
+    getFavorites();
+  }, [token]);
 
   return (
     <ThemeProvider theme={theme}>
