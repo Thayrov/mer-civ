@@ -6,10 +6,11 @@ import { IoIosArrowBack } from 'react-icons/io';
 import { LuFilter } from 'react-icons/lu';
 
 import { setFilterMarca, setFilterPrecio } from '../../store/slices/cardsSlice';
+import { fetchFilteredCards } from '../../store/thunks/cardsThunks';
 
 export default function FilterMenu({ className, activeFilterMenu, toggleFilterMenu, expanded }) {
   const dispatch = useDispatch();
-  const { allItems } = useSelector((state) => state.card);
+  const { allItems, filters } = useSelector((state) => state.card);
 
   const allBrands = [...allItems].map((product) => product.marca);
 
@@ -19,6 +20,13 @@ export default function FilterMenu({ className, activeFilterMenu, toggleFilterMe
   const [activeBrands, setActiveBrands] = useState(expanded);
   const [activeDeals, setActiveDeals] = useState(expanded);
   const menuRef = useRef(null);
+
+  useEffect(() => {
+    const fetch = async () => {
+      await dispatch(fetchFilteredCards(filters));
+    };
+    fetch();
+  }, [filters]);
 
   useEffect(() => {
     function handleClickOutside(event) {
