@@ -71,8 +71,7 @@ class usuarios {
         res.redirect(`${FRONT_URL}/new_password`);
       }
     } catch (error) {
-      res.redirect(FRONT_URL);
-      res.status(500).json({ message: error.message, error: 'Error en el login' });
+      res.redirect(`${FRONT_URL}/Token_Invalido`);
     }
   }
 
@@ -138,7 +137,7 @@ class usuarios {
 
   static async deleteUsuario(req, res) {
     try {
-      const { token } = req.cookies.sessionToken;
+      const token = req.cookies.sessionToken;
       const decoded = jwt.verify(token, SECRET_JWT);
       if (!decoded) {
         return res.status(401).json({ message: 'Acceso no autorizado' });
@@ -183,7 +182,7 @@ class usuarios {
 
   static async logout(req, res) {
     try {
-      const { token } = req.cookies.sessionToken;
+      const token = req.cookies.sessionToken;
       await usuariosHandler.logoutHandler(token);
       res.clearCookie('sessionToken', {
         httpOnly: true,
@@ -196,7 +195,7 @@ class usuarios {
 
   static async getUser(req, res) {
     try {
-      const { token } = req.cookies.sessionToken;
+      const token = req.cookies.sessionToken;
 
       const decoded = jwt.verify(token, SECRET_JWT);
       if (!decoded) {
@@ -212,7 +211,7 @@ class usuarios {
 
   static async deleteLogic(req, res) {
     try {
-      const { token } = req.cookies.sessionToken;
+      const token = req.cookies.sessionToken;
       const decoded = jwt.verify(token, SECRET_JWT);
       if (!decoded) {
         return res.status(401).json({ message: 'Acceso no autorizado' });
