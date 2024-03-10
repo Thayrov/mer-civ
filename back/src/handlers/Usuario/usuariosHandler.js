@@ -13,6 +13,7 @@ class usuariosHandler {
   static async getAll() {
     try {
       const usuarios = await prisma.usuario.findMany({
+        where: { rol: 'user' },
         include: {
           resenas: true,
           carrito: true,
@@ -50,6 +51,7 @@ class usuariosHandler {
   static async getByName(name) {
     try {
       const usuario = await prisma.usuario.findMany({
+        where: { rol: 'user' },
         include: {
           resenas: true,
           carrito: true,
@@ -68,7 +70,18 @@ class usuariosHandler {
     }
   }
 
-  static async registerHandler(firstName, lastName, email, password, secondName, photo, rol) {
+  static async registerHandler(
+    firstName,
+    lastName,
+    email,
+    password,
+    secondName,
+    photo,
+    rol,
+    subscribeBlog
+  ) {
+    if (subscribeBlog === 'false') subscribeBlog = false;
+    else subscribeBlog = true;
     try {
       const repeatEmail = await prisma.usuario.findFirst({
         where: { email },
@@ -106,6 +119,7 @@ class usuariosHandler {
           password: hashPassword,
           photo: secureUrl,
           rol,
+          subscribe_blog: subscribeBlog,
         },
       });
 
@@ -203,16 +217,27 @@ class usuariosHandler {
     }
   }
 
-  static async deleteLogic(id, valor) {
+  static async deleteLogic(id) {
     try {
+      const usuario = await prisma.usuario.findFirst({
+        where: { id },
+      });
+
+      if (!usuario) throw new Error('El usuario no se encuentra en la base de datos');
+
+      const updatedDisabled = !usuario.disabled;
+
       await prisma.usuario.update({
         where: {
           id,
         },
         data: {
-          disabled: valor,
+          disabled: updatedDisabled,
         },
       });
+      return {
+        message: `El usuario se ha ${updatedDisabled ? 'desactivado' : 'activado'} exitosamente`,
+      };
     } catch (error) {
       throw new Error(error);
     }

@@ -271,7 +271,7 @@ export default function Profile() {
       }));
     }
 
-    setErrors(validacionProveedor({ ...formData, [name]: value }));
+    setErrors(validacionProveedor({ ...currentDataProveedor, [name]: value }));
   }
   // validar errores en cada cambio del formData
   /* eslint-disable */
@@ -293,13 +293,14 @@ export default function Profile() {
 
   async function handleSave() {
     setIsLoading(true);
+
     const toSend = {
       // envía el nombre con el formato correcto en caso de estar mal
       firstName:
         formData.firstName.charAt(0).toUpperCase() +
         formData.firstName.slice(1).toLocaleLowerCase(),
       secondName:
-        formData.secondName === ''
+        formData.secondName === null || formData.secondName === ''
           ? ''
           : formData.secondName.charAt(0).toUpperCase() +
             formData.secondName.slice(1).toLocaleLowerCase(),
@@ -310,7 +311,6 @@ export default function Profile() {
       password: formData.password,
       photo: formData.file || '',
     };
-
     await dispatch(putProvider(formDataProveedor));
     const response = await dispatch(putUser(toSend));
     if (response.payload?.error) {
@@ -562,16 +562,7 @@ export default function Profile() {
                         <span className='text-crown-of-thorns-600 text-xs'>{errors.tel}</span>
                       )}
                     </div>
-                    <div className='self-center max-w-[350px] min-w-[250px] mx-auto p-2 mt-3'>
-                      <CustomInput
-                        label='Ubicacion'
-                        name='direccion'
-                        type='text'
-                        value={currentDataProveedor.ubicacion[2]}
-                        onChange={handleDirection}
-                        maxLength={30}
-                      />
-                    </div>
+
                     <div className='flex flex-col self-center max-w-[600px] min-w-[300px] mx-auto mt-3'>
                       <label htmlFor='departamento' className='text-pearl-bush-950 font-medium'>
                         Departamento:
@@ -588,17 +579,20 @@ export default function Profile() {
                           </option>
                         ))}
                       </select>
-                      <div className='text-crown-of-thorns-600'>{errors.departamento}</div>
+                      {currentDataProveedor.ubicacion[1] === 'sin dato' && (
+                        <span className='text-tuscany-200'>Por favor, seleccione un municipio</span>
+                      )}
                     </div>
-                    <div className='my-[25px] flex flex-col self-center max-w-[600px] min-w-[250px] mx-auto'>
-                      <label htmlFor='municipio' className='text-pearl-bush-950'>
+
+                    <div className='flex flex-col self-center max-w-[600px] min-w-[300px] mx-auto mt-3'>
+                      <label htmlFor='municipio' className='text-pearl-bush-950 font-medium'>
                         Municipio:
                       </label>
                       <select
                         name='municipio'
                         onChange={handleMunicipalityChange}
                         defaultValue={currentDataProveedor.ubicacion[1]}
-                        className='border-tuscany-950 hover:custom-border-2 text-tuscany-950 hover:text-tuscany-600 font-semibold outline-none rounded-md custom-transparent-bg cursor-pointer p-3'>
+                        className='border-tuscany-950 hover:custom-border-2 p-3 text-tuscany-950 hover:text-tuscany-600 font-semibold outline-none rounded-md custom-transparent-bg cursor-pointer'>
                         <option value=''>Seleccione un municipio</option>
                         {municipiosPrincipales[currentDataProveedor.ubicacion[0]].map(
                           (municipio, index) => (
@@ -609,10 +603,22 @@ export default function Profile() {
                         )}
                       </select>
                       {currentDataProveedor.ubicacion[1] === 'sin dato' && (
-                        <label className='text-crown-of-thorns-600'>
+                        <span className='text-crown-of-thorns-600'>
                           Por favor, seleccione un municipio
-                        </label>
+                        </span>
                       )}
+                    </div>
+
+                    <div className='self-center max-w-[350px] min-w-[250px] mx-auto p-2 mb-5 mt-3'>
+                      <TextField
+                        label='Ubicacion'
+                        name='direccion'
+                        type='text'
+                        className='w-[300px] m-2 bg-pearl-bush-100'
+                        value={currentDataProveedor.ubicacion[2]}
+                        onChange={handleDirection}
+                        maxLength={30}
+                      />
                     </div>
                   </ul>
                 </div>

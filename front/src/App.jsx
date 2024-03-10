@@ -54,23 +54,77 @@ import { getAllFavorite } from './store/thunks/favoritesThuks.js';
 import { logout } from './store/thunks/authThunks.js';
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 import Providers from './views/Providers/Providers.jsx';
+import PaymentSuccess from './views/PasarelaDePago/PaymentSuccess.jsx';
+import PaymentError from './views/PasarelaDePago/PaymentError.jsx';
+
+import PointDetail from './views/PointDetail/PointDetail.jsx';
 
 function ProtectedRoute({ Component }) {
-  const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
-  if (token !== null) return <Component />;
-  dispatch(createToast('Debes iniciar sesión para acceder a esta página'));
-  return <Navigate to='/login' />;
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!token) {
+      dispatch(createToast('Debes iniciar sesión para acceder a esta página'));
+    }
+  }, [dispatch, token]);
+
+  if (!token) {
+    return <Navigate to='/login' />;
+  }
+
+  return <Component />;
+}
+
+function AdminProtectedRoute({ Component }) {
+  const { token, rol } = useSelector((state) => state.auth);
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!(token !== null && rol === 'admin')) {
+      dispatch(createToast('Este contenido es solo para administradores.'));
+    }
+  }, [dispatch, token, rol]);
+
+  if (!(token !== null && rol === 'admin')) {
+    return <Navigate to='/store' />;
+  }
+
+  return <Component />;
+}
+
+function SupplierProtectedRoute({ Component }) {
+  const { token, rol } = useSelector((state) => state.auth);
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!(token !== null && rol === 'proveedor')) {
+      dispatch(createToast('Este contenido es solo para proveedores.'));
+    }
+  }, [dispatch, token, rol]);
+
+  if (!(token !== null && rol === 'proveedor')) {
+    return <Navigate to='/store' />;
+  }
+
+  return <Component />;
 }
 
 function CheckAlreadyLoggedIn({ Component }) {
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
-  if (!token) return <Component />;
-  else {
-    dispatch(createToast('Tu sesión ya está activa.'));
+
+  useEffect(() => {
+    if (token) {
+      dispatch(createToast('Tu sesión ya está activa.'));
+    }
+  }, [dispatch, token]);
+
+  if (token) {
     return <Navigate to='/store' />;
   }
+
+  return <Component />;
 }
 
 function App() {
@@ -107,13 +161,11 @@ function App() {
   const isUserDetailPage = useMatch('/admin/users/detail/:id');
   const isProductDetailPage = useMatch('/admin/products/detail/:id');
 
-  const getFavorites = async () => {
-    if (token) await dispatch(getAllFavorite());
-  };
-
   useEffect(() => {
-    getFavorites();
-  }, [dispatch, getFavorites, token]);
+    (async () => {
+      if (token) await dispatch(getAllFavorite());
+    })();
+  }, [dispatch, token]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -151,7 +203,7 @@ function App() {
           <Route path='/faqs' element={<Faqs />} />
           <Route path='/faqs/:category/page?/:page?' element={<CategoryFaqs />} />
           <Route path='/faqs/detail/:id' element={<DetailFaq />} />
-          <Route path='/admin' element={<AdminDashboard />} />
+          <Route path='/admin' element={<AdminProtectedRoute Component={AdminDashboard} />} />
           <Route
             path='/admin/products'
             element={<AdminProducts products={products} setProducts={setProducts} />}
@@ -170,14 +222,21 @@ function App() {
           <Route path='/admin/users/detail/:id' element={<UserDetail />} />
           <Route path='/admin/points' element={<AdminPoints />} />
 
-          <Route path='/supplier' element={<SupplierDashboard />}>
+          <Route
+            path='/supplier'
+            element={<SupplierProtectedRoute Component={SupplierDashboard} />}>
             <Route path='/supplier/settings' element={<SupplierSettings />} />
             <Route path='/supplier/points' element={<SupplierPoints />} />
           </Route>
 
+          <Route path='/point/detail/:id' element={<PointDetail />} />
+
           <Route path='/politica_de_cookies' element={<PoliticaCookies />} />
           <Route path='/aviso_legal' element={<AvisoLegal />} />
           <Route path='/politica_de_privacidad' element={<PoliticaPrivacidad />} />
+
+          <Route path='/payment_success' element={<PaymentSuccess />} />
+          <Route path='/payment_error' element={<PaymentError />} />
         </Routes>
       </div>
     </ThemeProvider>

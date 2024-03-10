@@ -47,9 +47,9 @@ class ProductHandler {
     }
   }
 
-  static async logicDelete(id, valor) {
+  static async logicDelete(id) {
     try {
-      const producto = await prisma.producto.findUnique({
+      const producto = await prisma.producto.findFirst({
         where: {
           id,
         },
@@ -57,17 +57,19 @@ class ProductHandler {
 
       if (!producto) throw new Error('El producto no se encuentra en la base de datos');
 
+      const updatedDisabled = !producto.disabled;
+
       await prisma.producto.update({
         where: {
           id,
         },
         data: {
-          disabled: valor,
+          disabled: updatedDisabled,
         },
       });
 
       return {
-        message: 'El producto se ha desactivado exitosamente',
+        message: `El producto se ha ${updatedDisabled ? 'desactivado' : 'activado'} exitosamente`,
       };
     } catch (error) {
       throw new Error(error);
@@ -134,24 +136,23 @@ class ProductHandler {
   static async getName(name) {
     try {
       const productos = await prisma.producto.findMany({
-        where: {
-          name: {
-            contains: name,
-          },
-        },
         include: {
           resenas: true,
           proveedor: true,
           inventario: true,
         },
       });
-      return productos;
+      const productosName = productos.filter((p) => {
+        const productName = p.name;
+        return productName.toLowerCase().startsWith(name.toLowerCase());
+      });
+      return productosName;
     } catch (error) {
       throw new Error(error.message);
     }
   }
 
-  static async put(id, name, description, image, marca, proveedoresCostos, idProveedorActual) {
+  static async put(id, name, description, image, marca, proveedoresCostos) {
     try {
       const updatedData = {};
 
@@ -160,18 +161,37 @@ class ProductHandler {
       if (marca) updatedData.marca = marca;
 
       if (proveedoresCostos) {
+        // Eliminar proveedores costos que ya no están presentes
+        const proveedoresIds = proveedoresCostos.map(
+          (proveedorCosto) => proveedorCosto.proveedor_id
+        );
+        await prisma.productoProveedor.deleteMany({
+          where: {
+            producto_id: id,
+            NOT: {
+              proveedor_id: {
+                in: proveedoresIds,
+              },
+            },
+          },
+        });
+
         //! Actualiza la relación existente entre el proveedor y el producto, esto es muy importante
         await Promise.all(
           proveedoresCostos.map((proveedorCosto) =>
-            prisma.productoProveedor.update({
+            prisma.productoProveedor.upsert({
               where: {
                 proveedor_id_producto_id: {
-                  proveedor_id: Number(idProveedorActual),
+                  proveedor_id: Number(proveedorCosto.proveedor_id),
                   producto_id: id,
                 },
               },
-              data: {
+              update: {
+                costo: proveedorCosto.costo,
+              },
+              create: {
                 proveedor_id: Number(proveedorCosto.proveedor_id),
+                producto_id: id,
                 costo: proveedorCosto.costo,
               },
             })

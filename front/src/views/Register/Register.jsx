@@ -24,6 +24,7 @@ function Register() {
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+
   // Estado para los datos del formulario y los errores de validación
   const [formData, setFormData] = useState({
     photo: null,
@@ -34,6 +35,7 @@ function Register() {
     password: '',
     repeatPassword: '',
     imgPreview: '',
+    subscribeBlog: false,
   });
   const [errors, setErrors] = useState({});
 
@@ -115,86 +117,54 @@ function Register() {
   const handleNavigate = (path) => () => {
     navigate(path);
   };
-  // Maneja el envío del formulario
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Verificar si se proporcionó una imagen
-    const isImageProvided = formData.photo !== null;
+    const validationPayload = {
+      ...formData,
+      ...(formData.photo && { photo: formData.photo }),
+    };
+    const formErrors = registerValidation(validationPayload);
+    setErrors(formErrors);
 
-    // Si se proporciona una imagen, validarla
-    if (isImageProvided) {
-      const formErrors = registerValidation(formData); // Realizar validación del formulario
-      setErrors(formErrors);
+    const requiredFields = ['firstName', 'lastName', 'email', 'password', 'repeatPassword'];
+    const isFormValid = requiredFields.every((field) => formData[field].trim() !== '');
 
-      // Validamos que los campos obligatorios estén completos
-      const requiredFields = ['firstName', 'lastName', 'email', 'password', 'repeatPassword'];
-      const isFormValid = requiredFields.every((field) => formData[field].trim() !== '');
-
-      if (isFormValid && Object.keys(formErrors).length === 0) {
+    if (isFormValid && Object.keys(formErrors).length === 0) {
+      if (formData.photo || acceptTerms) {
         try {
           await dispatch(register(formData));
-          dispatch(createToast('Usuario creado con exito. Por favor inicia sesión.'));
+          dispatch(createToast('Usuario creado con éxito. Por favor inicia sesión.'));
+
+          setFormData({
+            photo: null,
+            firstName: '',
+            secondName: '',
+            lastName: '',
+            email: '',
+            password: '',
+            repeatPassword: '',
+            subscribeBlog: false,
+          });
+
+          navigate('/login');
         } catch (error) {
-          dispatch(createToast('Error al registrar usuario: ' + error.message));
+          dispatch(createToast(`Error al registrar usuario: ${error.message}`));
         }
-
-        setFormData({
-          photo: null,
-          firstName: '',
-          secondName: '',
-          lastName: '',
-          email: '',
-          password: '',
-          repeatPassword: '',
-        });
-
-        navigate('/login');
       } else {
-        // Si la validación del formulario falla pero el campo de contraseña está oculto, no mostrar el mensaje de error
-        if (!(showPassword || showRepeatPassword)) {
-          dispatch(createToast('Por favor, complete todos los campos obligatorios correctamente'));
-        }
+        dispatch(createToast('Por favor, acepte los términos y condiciones.'));
       }
     } else {
-      // Si no se proporciona ninguna imagen, continuar con el envío del formulario sin validarla
-      const formErrors = registerValidation({
-        ...formData,
-        photo: '', // Simular que se proporciona una URL de imagen vacía para evitar errores de validación
-      });
-      setErrors(formErrors);
-
-      // Validamos que los campos obligatorios estén completos
-      const requiredFields = ['firstName', 'lastName', 'email', 'password', 'repeatPassword'];
-      const isFormValid = requiredFields.every((field) => formData[field].trim() !== '');
-
-      if (isFormValid && Object.keys(formErrors).length === 0) {
-        try {
-          await dispatch(register(formData));
-          if (!acceptTerms) {
-            dispatch(
-              createToast('Por favor, complete todos los campos obligatorios correctamente')
-            );
-          }
-        } catch (error) {
-          dispatch(createToast('Error al registrar usuario: ' + error.message));
-        }
-        setFormData({
-          photo: null,
-          firstName: '',
-          secondName: '',
-          lastName: '',
-          email: '',
-          password: '',
-          repeatPassword: '',
-        });
-        navigate('/login');
-      } else {
-        if (!(showPassword || showRepeatPassword)) {
-          dispatch(createToast('Por favor, complete todos los campos obligatorios correctamente.'));
-        }
-      }
+      dispatch(createToast('Por favor, complete todos los campos obligatorios correctamente.'));
     }
+  };
+
+  const handleSubscribeBlog = (event) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      subscribeBlog: event.target.checked,
+    }));
   };
 
   return (
@@ -362,7 +332,11 @@ function Register() {
               onChange={() => setAcceptTerms(!acceptTerms)}
               disabled={!allFieldsCompleted()}
             />
-            <CheckboxBasic label={'Quiero recibir notificaciones de MercadilloCivico'} />
+            <CheckboxBasic
+              checked={formData?.subscribeBlog}
+              onChange={handleSubscribeBlog}
+              label={'Quiero recibir notificaciones de MercadilloCivico'}
+            />
 
             <CustomButton
               type='submit'

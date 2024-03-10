@@ -42,9 +42,11 @@ const CardProductBar = ({ idPuntoVenta, precioVenta, idSuplier, stock, stockMin,
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchProvidersAsync(idSuplier));
-    dispatch(fetchSalesPointsAsync(idPuntoVenta));
-  }, [dispatch]);
+    (async () => {
+      await dispatch(fetchProvidersAsync(idSuplier));
+      await dispatch(fetchSalesPointsAsync(idPuntoVenta));
+    })();
+  }, [dispatch, idPuntoVenta, idSuplier]);
 
   const truncatedSuplier =
     providerArray.name_prov?.length > charLimit
@@ -56,27 +58,27 @@ const CardProductBar = ({ idPuntoVenta, precioVenta, idSuplier, stock, stockMin,
       : items.company_name;
 
   return (
-    <div className='mx-4 hover:bg-pearl-bush-200 py-2 px-[1em] text-tuscany-950 font-semibold rounded-md'>
+    <div className='hover:bg-pearl-bush-200  text-tuscany-950 font-semibold rounded-md'>
       <ul className='flex justify-between items-center text-start text-[.8em]'>
         <li className='flex items-center w-[1em]'>
           <span className='overflow-ellipsis whitespace-nowrap'>{truncatedSuplier}</span>
         </li>
-        <li className='flex items-center w-[1em]'>
+        <li className='hidden sm:flex items-center w-[1em]'>
           <span className='overflow-ellipsis whitespace-nowrap'>{truncatedPuntoDeVenta}</span>
         </li>
-        <li className='flex items-center w-[1em]'>
+        <li className='hidden lg:flex items-center w-[1em]'>
           <span>$0</span>
         </li>
-        <li className='flex items-center w-[1em]'>
+        <li className='hidden sm:flex items-center w-[1em]'>
           <span>{precioVenta}</span>
         </li>
-        <li className='flex items-center w-[1em]'>
+        <li className='hidden md:flex items-center w-[1em]'>
           <span>{stockMax}</span>
         </li>
         <li className='flex items-center w-[1em]'>
           <span>{stock}</span>
         </li>
-        <li className='flex items-center w-[1em]'>
+        <li className='hidden md:flex items-center w-[1em]'>
           <span>{stockMin}</span>
         </li>
         <br />

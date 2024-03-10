@@ -5,9 +5,9 @@ const VITE_API_URL = import.meta.env.VITE_API_URL;
 // Thunk para obtener productos (todos o por ID)
 export const fetchProductsAsync = createAsyncThunk(
   'products/fetchProductsAsync',
-  async (pid, { rejectWithValue }) => {
+  async (param, { rejectWithValue }) => {
     try {
-      const url = pid ? `${VITE_API_URL}/product/${pid}` : `${VITE_API_URL}/product`;
+      const url = param ? `${VITE_API_URL}/product/?name=${param}` : `${VITE_API_URL}/product`;
       const response = await axios.get(url);
       return response.data;
     } catch (error) {
@@ -122,7 +122,6 @@ export const editProductAsync = createAsyncThunk(
       formData.append('description', productData.description);
       formData.append('marca', productData.marca);
       formData.append('image', productData.fiImg);
-      formData.append('idProveedorActual', productData.idProveedorActual);
       formData.append('proveedoresCostos', JSON.stringify(productData.proveedoresCostos));
       const response = await axios.put(`${VITE_API_URL}/product/edit/${productData.id}`, formData, {
         headers: {
@@ -132,6 +131,37 @@ export const editProductAsync = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Thunk para filtrar productos
+export const fetchFilteredProducts = createAsyncThunk(
+  'products/fetchFilteredProducts',
+  async ({ filtroPrecio, filtroEstado, name }, { rejectWithValue }) => {
+    try {
+      let url = `${VITE_API_URL}/productos/filtro`;
+      let querys = {};
+
+      if (filtroPrecio) {
+        querys.filtroPrecio = filtroPrecio;
+      }
+      if (filtroEstado) {
+        querys.filtroEstado = filtroEstado;
+      }
+      if (name) {
+        querys.name = name;
+      }
+
+      if (Object.keys(querys).length === 0) {
+        const response = await axios.get(url);
+        return response.data;
+      }
+
+      const response = await axios.get(url, { params: querys });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
     }
   }
 );

@@ -11,6 +11,7 @@ const validateMiddleware = require('../../middleware/validateMiddleware');
 const ReseñasController = require('../controllers/Reseñas/reseñasController');
 const HistorialController = require('../controllers/HistorialDeVenta/historialController');
 const FiltroController = require('../controllers/Filtros/filtroController');
+const AdminFiltrosController = require('../controllers/AdminFiltros/adminFiltrosController');
 const datosTarjeta = require('../controllers/dataCard/datosTarjeta');
 const { checkAuthentication } = require('../../middleware/validationToken');
 const StripeController = require('../controllers/Stripe/stripeController');
@@ -31,14 +32,17 @@ router.delete('/delete/user', usuariosController.usuarios.deleteUsuario);
 router.put('/disable/user', usuariosController.usuarios.deleteLogic);
 router.get('/user/info/:id?', usuariosController.usuarios.get);
 router.get('/user/profile', usuariosController.usuarios.getUser);
+// rutas para los delete de usuario desde admin
+router.delete('/delete/usuario/:id', usuariosController.usuarios.deleteUserByAdmin);
+router.put('/disable/usuario/:id', usuariosController.usuarios.deleteLogicByAdmin);
 
 // products
 
 router.get('/product/:id?', ProductController.get);
-router.post('/postProduct', ProductController.post);
-router.delete('/productoLogic/:id', ProductController.logicDelete);
-router.delete('/productoTrue/:id', ProductController.trueDelete);
-router.put('/product/edit/:id', ProductController.put);
+router.post('/postProduct', middleware.protectRoute, ProductController.post);
+router.delete('/productoLogic/:id', middleware.protectRoute, ProductController.logicDelete);
+router.delete('/productoTrue/:id', middleware.protectRoute, ProductController.trueDelete);
+router.put('/product/edit/:id', middleware.protectRoute, ProductController.put);
 
 // favorites
 
@@ -68,13 +72,19 @@ router.post('/punto_de_venta', PuntoDeVentaController.post);
 router.put('/punto_de_venta/edit/:id', PuntoDeVentaController.put);
 router.put('/punto_de_venta/add/', PuntoDeVentaController.addProveedor);
 router.put('/punto_de_venta/remove/:id', PuntoDeVentaController.removeProveedor);
-router.delete('/punto_de_venta/:id', PuntoDeVentaController.delete);
+router.delete('/punto_de_venta_logic/:id', PuntoDeVentaController.logicDelete);
+router.delete('/punto_de_venta_true/:id', PuntoDeVentaController.trueDelete);
 
 // Inventario
-router.post('/inventario', validateMiddleware.validateInventario, InventarioController.post);
+router.post(
+  '/inventario',
+  middleware.protectRoute,
+  validateMiddleware.validateInventario,
+  InventarioController.post
+);
 router.get('/inventario/:id?', InventarioController.get);
 router.put('/inventario/', InventarioController.put);
-router.delete('/inventario/:id', InventarioController.delete);
+router.delete('/inventario/:id', middleware.protectRoute, InventarioController.delete);
 
 // Reseñas
 router.get('/resenas/:id?', ReseñasController.get);
@@ -90,6 +100,7 @@ router.delete('/historialCompra/:id', HistorialController.delete);
 
 // Filtros
 router.get('/filtro/:id', validateMiddleware.validateFilter, FiltroController.filterProductos);
+router.get('/productos/filtro', AdminFiltrosController.filtrarProductos);
 
 // datosTarjeta
 
