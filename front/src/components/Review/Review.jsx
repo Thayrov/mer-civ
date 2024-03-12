@@ -73,11 +73,15 @@ const Review = ({
         <>
           <div className='flex justify-start items-center text-[.7em] md:text-[.9em] lg:text-[1.2em] pl-2 pt-2 text-tuscany-950'>
             {user && user.photo ? (
-              <img src={user.photo} alt='' width={25} className='rounded-full' />
+              <img
+                src={user.photo}
+                alt=''
+                className='rounded-full h-[30px] w-[30px] object-cover'
+              />
             ) : (
               <FaUser />
             )}
-            <span className='mx-1 text-center'>{`${user && user.first_name ? user.first_name : ''} ${user && user.second_name ? user.second_name : ''} ${user && user.last_name ? user.last_name : ''}`}</span>
+            <span className='mx-1 text-center'>{`${user && user.first_name ? user.first_name : ''} ${user && user.second_name && user.second_name.toLowerCase() === 'null' ? user.second_name : ''} ${user && user.last_name ? user.last_name : ''}`}</span>
           </div>
           <div className='flex justify-start pl-2 items-center text-[.8em] md:text-[1em] lg:text-[1.15em] text-tuscany-950 my-1'>
             <Box component='fieldset' p={0} borderColor='transparent'>
