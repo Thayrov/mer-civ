@@ -51,6 +51,7 @@ import Providers from './views/Providers/Providers.jsx';
 import PaymentSuccess from './views/PasarelaDePago/PaymentSuccess.jsx';
 import PaymentError from './views/PasarelaDePago/PaymentError.jsx';
 import PointDetail from './views/PointDetail/PointDetail.jsx';
+import ProviderDetail from './views/ProviderDetail/ProviderDetail.jsx';
 
 function ProtectedRoute({ Component }) {
   const { token } = useSelector((state) => state.auth);
@@ -203,10 +204,11 @@ function App() {
           </Route>
 
           <Route path='/faqs' element={<Faqs />} />
-          <Route path='/faqs/:category/page?/:page?' element={<CategoryFaqs />} />
           <Route path='/faqs/detail/:id' element={<DetailFaq />} />
-          <Route path='/admin' element={<AdminProtectedRoute Component={AdminDashboard} />} />
+          <Route path='/faqs/detail' element={<Navigate replace to='/faqs' />} />
+          <Route path='/faqs/:category/page?/:page?' element={<CategoryFaqs />} />
 
+          <Route path='/admin' element={<AdminProtectedRoute Component={AdminDashboard} />} />
           <Route
             path='/admin/products'
             element={
@@ -246,6 +248,10 @@ function App() {
           <Route
             path='/admin/users/detail/:id'
             element={<AdminProtectedRoute Component={UserDetail} />}
+          />
+          <Route
+            path='/admin/provider/:id'
+            element={<AdminProtectedRoute Component={ProviderDetail} />}
           />
           <Route path='/admin/points' element={<AdminProtectedRoute Component={AdminPoints} />} />
           <Route
