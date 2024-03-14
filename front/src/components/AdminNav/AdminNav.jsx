@@ -31,7 +31,7 @@ const AdminNav = () => {
 
           {/* Agregar estilos a links activos más adelante */}
           <div className='hidden mt-2 lg:flex justify-start items-center w-full h-full'>
-            <Link className='ml-5' to={'/admin'}>
+            <Link className='ml-5' to={'/'}>
               <img className='h-[55px] w-[55px] object-contain' src={LogoMC} alt='Logo' />
             </Link>
           </div>
@@ -67,16 +67,18 @@ const AdminNav = () => {
               <li>Puntos de venta</li>
             </Link>
 
-            <Link to='/admin/orders' className='text-tuscany-800 hover:text-tuscany-950 transition'>
+            {/* <Link to='/admin/orders' className='text-tuscany-800 hover:text-tuscany-950 transition'>
               <li>Pedidos</li>
-            </Link>
+            </Link> */}
+
             <Link to='/admin/users' className='text-tuscany-800 hover:text-tuscany-950 transition'>
               <li>Usuarios</li>
             </Link>
-            <Link
-              to='/admin/company'
-              className='text-tuscany-800 hover:text-tuscany-950 transition'>
+            <Link to='/admin/faqs' className='text-tuscany-800 hover:text-tuscany-950 transition'>
               <li> FAQs</li>
+            </Link>
+            <Link to='/' className='text-tuscany-800 hover:text-tuscany-950 transition'>
+              <li>Salir</li>
             </Link>
           </ul>
         </header>

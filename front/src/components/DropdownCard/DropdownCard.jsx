@@ -37,6 +37,7 @@ export default function Card({
 
   const { idCarrito } = useSelector((state) => state.carrito);
   const { status } = useSelector((state) => state.favorites);
+  const { token } = useSelector((state) => state.auth);
   const {
     items: { productoEnCarrito },
   } = useSelector((state) => state.carrito);
@@ -47,24 +48,33 @@ export default function Card({
   //#############################################################
 
   const agregarAlCarrito = async () => {
-    await dispatch(
-      addProductToCartDBThunk({
-        carritoId: idCarrito,
-        inventarioId,
-        cantidad,
-      })
-    );
-    await dispatch(getCartDBThunk());
-    dispatch(createToast('Producto agregado al carrito'));
+    if (token) {
+      await dispatch(
+        addProductToCartDBThunk({
+          carritoId: idCarrito,
+          inventarioId,
+          cantidad,
+        })
+      );
+      await dispatch(getCartDBThunk());
+      dispatch(createToast('Producto agregado al carrito'));
+    } else {
+      dispatch(createToast('Función desactivada. Por favor inicia sesión.'));
+    }
   };
 
   const [cantidad, setCantidad] = useState(1);
 
   const handleFavorite = async () => {
-    if (isFav) {
-      await dispatch(removeFavorite(id));
+    if (token) {
+      if (isFav) {
+        await dispatch(removeFavorite(id));
+      } else {
+        await dispatch(addFavorite(id));
+      }
     } else {
-      await dispatch(addFavorite(id));
+      dispatch(createToast('Función desactivada. Por favor inicia sesión.'));
+      setIsFav(false);
     }
   };
 
@@ -92,8 +102,8 @@ export default function Card({
     <div
       className={
         active
-          ? `relative w-full max-w-[500px] rounded-xl overflow-hidden bg-tuscany-300 text-pearl-bush-950 shadow-md shadow-[#00000030] outline outline-1 outline-tuscany-600 ${className} ${style.active}`
-          : `relative w-full max-w-[500px] rounded-xl overflow-hidden bg-tuscany-300 text-pearl-bush-950 shadow-md shadow-[#00000030] outline outline-1 outline-tuscany-600 ${className} ${style.hidden}`
+          ? `relative w-full  rounded-xl overflow-hidden bg-tuscany-300 text-pearl-bush-950 shadow-md shadow-[#00000030] outline outline-1 outline-tuscany-600 ${className} ${style.active}`
+          : `relative w-full  rounded-xl overflow-hidden bg-tuscany-300 text-pearl-bush-950 shadow-md shadow-[#00000030] outline outline-1 outline-tuscany-600 ${className} ${style.hidden}`
       }>
       <div className='flex'>
         <div
@@ -125,8 +135,8 @@ export default function Card({
                   await handleFavorite();
                 }
               }}
-              className='absolute bottom-0 m-1 w-[25px] h-[25px]'>
-              <TiHeartFullOutline className='w-full h-full' />
+              className='absolute bg-[#00000062] backdrop-blur-[3px] rounded-lg bottom-0 m-1 w-[25px] h-[25px]'>
+              <TiHeartFullOutline className='w-full h-full text-tuscany-50' />
             </div>
           ) : (
             <div
@@ -138,8 +148,8 @@ export default function Card({
                   await handleFavorite();
                 }
               }}
-              className='absolute bottom-0 m-1 w-[25px] h-[25px]'>
-              <TiHeartOutline className='w-full h-full' />
+              className='absolute bg-[#00000062] backdrop-blur-[3px] rounded-lg bottom-0 m-1 w-[25px] h-[25px]'>
+              <TiHeartOutline className='w-full h-full text-tuscany-50' />
             </div>
           )}
         </div>

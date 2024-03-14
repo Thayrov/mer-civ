@@ -1,15 +1,15 @@
 import AllUsersCard from '../AllUsersCard/AllUsersCard';
 import AllProvidersCard from '../AllProvidersCard/AllProvidersCard';
 import AllProductsCard from '../AllProductsCard/AllProductsCard';
-import AllOrdersCard from '../AllOrdersCard/AllOrdersCard';
+import AllPointsCard from '../AllPointsCard/AllPointsCard';
 
 const CardsAdminDashboard = () => {
   return (
-    <div className='flex flex-wrap justify-center xl:justify-between items-center'>
+    <div className='flex flex-wrap justify-center xl:justify-between items-center w-full max-w-[1366px] mx-auto '>
       <AllUsersCard />
       <AllProvidersCard />
       <AllProductsCard />
-      <AllOrdersCard />
+      <AllPointsCard />
     </div>
   );
 };

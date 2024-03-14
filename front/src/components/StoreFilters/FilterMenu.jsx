@@ -18,7 +18,7 @@ export default function FilterMenu({ className, activeFilterMenu, toggleFilterMe
 
   const [activePrices, setActivePrices] = useState(expanded);
   const [activeBrands, setActiveBrands] = useState(expanded);
-  const [activeDeals, setActiveDeals] = useState(expanded);
+  // const [activeDeals, setActiveDeals] = useState(expanded);
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function FilterMenu({ className, activeFilterMenu, toggleFilterMe
   useEffect(() => {
     function handleClickOutside(event) {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
-        toggleFilterMenu();
+        toggleFilterMenu && toggleFilterMenu();
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -79,6 +79,7 @@ export default function FilterMenu({ className, activeFilterMenu, toggleFilterMe
                 <li
                   onClick={() => {
                     dispatch(setFilterPrecio('bajo'));
+                    toggleFilterMenu();
                   }}
                   className='text-tuscany-100 mb-2 pl-2 cursor-pointer underline underline-offset-2'>
                   Precios bajos
@@ -86,6 +87,7 @@ export default function FilterMenu({ className, activeFilterMenu, toggleFilterMe
                 <li
                   onClick={() => {
                     dispatch(setFilterPrecio('medio'));
+                    toggleFilterMenu();
                   }}
                   className='text-tuscany-100 mb-2 pl-2 cursor-pointer underline underline-offset-2'>
                   Precios medios
@@ -93,6 +95,7 @@ export default function FilterMenu({ className, activeFilterMenu, toggleFilterMe
                 <li
                   onClick={() => {
                     dispatch(setFilterPrecio('alto'));
+                    toggleFilterMenu();
                   }}
                   className='text-tuscany-100 mb-2 pl-2 cursor-pointer underline underline-offset-2'>
                   Precios altos
@@ -121,7 +124,10 @@ export default function FilterMenu({ className, activeFilterMenu, toggleFilterMe
                 {uniqueBrands.map((brand) => (
                   <li
                     key={brand}
-                    onClick={() => dispatch(setFilterMarca(brand))}
+                    onClick={() => {
+                      dispatch(setFilterMarca(brand));
+                      toggleFilterMenu();
+                    }}
                     className='text-tuscany-100 mb-2 line-clamp-1 pl-2 cursor-pointer underline underline-offset-2'>
                     {brand}
                   </li>
@@ -130,7 +136,7 @@ export default function FilterMenu({ className, activeFilterMenu, toggleFilterMe
             )}
           </div>
 
-          {/* DESCUENTOS */}
+          {/* DESCUENTOS 
           <div className='rounded-xl overflow-hidden mx-1 my-2 bg-tuscany-400 drop-shadow-sm '>
             <div
               onClick={() => {
@@ -157,8 +163,8 @@ export default function FilterMenu({ className, activeFilterMenu, toggleFilterMe
                   Hasta un 25%
                 </li>
               </ul>
-            )}
-          </div>
+            )}  
+          </div>*/}
         </div>
         <button
           className='md:hidden border-none bg-tuscany-600 shadow-sm w-[80px] h-[50px] text-tuscany-100 rounded-xl mt-auto mx-auto mb-2 cursor-pointer hover:bg-tuscany-700 active:bg-tuscany-800 transition pr-[2px]'
